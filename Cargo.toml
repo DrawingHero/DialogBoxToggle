@@ -1,0 +1,23 @@
+[package]
+name = "TitleVoiceRemover"
+version = "0.1.0"
+authors = []
+edition = "2021"
+
+[package.metadata.skyline]
+titleid = "01006A800016E000" # Smash Ultimate
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+engage = { git = "https://github.com/DrawingHero/engage", version = "0.11.0" }
+skyline = "0.3.0"
+unity = { git = "https://github.com/DivineDragonFanClub/unity", version = "0.3.0" }
+
+[profile.dev]
+panic = "abort"
+
+[profile.release]
+panic = "abort"
+lto = true
