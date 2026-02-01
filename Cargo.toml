@@ -1,5 +1,5 @@
 [package]
-name = "TitleVoiceRemover"
+name = "DialogBoxToggle"
 version = "0.1.0"
 authors = []
 edition = "2021"
@@ -11,7 +11,10 @@ titleid = "01006A800016E000" # Smash Ultimate
 crate-type = ["cdylib"]
 
 [dependencies]
+cobapi = { git = "https://github.com/DivineDragonFanClub/cobapi", version = "0.4.0" }
 engage = { git = "https://github.com/DivineDragonFanClub/engage", version = "0.11.0" }
+lazy_static = "1.5.0"
+phf = { version = "0.13.1", features = ["macros"] }
 skyline = "0.3.0"
 unity = { git = "https://github.com/DivineDragonFanClub/unity", version = "0.3.0" }
 

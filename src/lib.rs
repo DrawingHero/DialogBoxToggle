@@ -1,15 +1,26 @@
 // Currently needed because we use these functionality, they'll be removable when the Rust language stabilizes them
 #![feature(lazy_cell, ptr_sub_ptr)]
 use unity::prelude::*;
+use dialog_config::talk_settings_callback;
+use dialog_config::SWITCH_PRESSED;
+use utils::get_config;
+
 use engage::{
 pad::Pad, util::get_instance,
 };
-static mut MINUS_PRESSED: bool = false;
-
 use engage::proc::ProcInstFields;
-
-//Making a struct with the same fields as TalkUI
-
+pub mod utils;
+pub mod dialog_config;
+//Structs with the same fields as TalkUI and MyRoomRelianceSequence
+pub struct MyRoomRelianceSequence {
+    pub super_fields: ProcInstFields,
+    pub maincontent: *mut u8,  
+    pub root: *mut u8,         
+    pub content: *mut u8,        
+    pub subcontent: *mut u8,     
+}
+static mut CONVO: bool = false;
+static mut MINUS_PRESSED: bool = false;
 pub struct TalkUI {
     pub super_fields: ProcInstFields,
     pub m_system_objects: *mut u8,
@@ -19,14 +30,6 @@ pub struct TalkUI {
     pub m_reserve_focus_window: *mut u8,
     pub m_event_picture_controller: *mut u8, 
 }
-/// This is called a proc(edural) macro. You use this to indicate that a function will be used as a hook.
-///
-/// Pay attention to the argument, offset.
-/// This is the address of the start of the function you would like to hook.
-/// This address has to be relative to the .text section of the game.
-/// If you do not know what any of this means, take the address in Ghidra and remove the starting ``71`` and the zeroes that follow it.
-/// Do not forget the 0x indicator, as it denotates that you are providing a hexadecimal value.
-
 //Function that closes dialog box 
 #[skyline::from_offset(0x21dd070)]
 pub fn talk_ui_hide(this : &TalkUI,  method_info: OptionalMethod);
@@ -35,12 +38,30 @@ pub fn talk_ui_hide(this : &TalkUI,  method_info: OptionalMethod);
 #[skyline::from_offset(0x21dd000)]
 pub fn talk_ui_show(this : &TalkUI,  method_info: OptionalMethod);
 
+
+#[skyline::hook(offset = 0x2396920)]
+pub fn myroomreliancesequence_entry(event_name: &MyRoomRelianceSequence, method_info: OptionalMethod,) {
+    unsafe {CONVO = true; }
+    call_original!(event_name, method_info);
+}
+#[skyline::hook(offset = 0x2396d40)]
+pub fn myroomreliancesequence_exit(event_name: &MyRoomRelianceSequence, method_info: OptionalMethod,) {
+    unsafe { CONVO = false;}
+    call_original!(event_name, method_info);
+}
+
 #[skyline::hook(offset = 0x21dcfe0)]
 pub fn talkui_update(this: &TalkUI, method_info: OptionalMethod) { 
-    // This tick is for TalkSequence, which is every frame the dialog box is displayed
-    // Since the function is run every frame, it'll always be available to update a bool value that can be used to turn the 
-    // dialog box off and on again.
-    println!("Tick is working!");
+    //If the support convo hide dialogue by default button was pressed
+    if unsafe { SWITCH_PRESSED == true } {
+        //If a support conversation is happening
+        if unsafe { CONVO == true } {
+            //Hide the dialog box
+            open_closer( unsafe {CONVO}, this, method_info);
+            //To keep it from always hiding it every tick, we need to change the value of CONVO
+            unsafe { CONVO = false };
+        }
+    }
     let pad_instance = get_instance::<Pad>();
     if pad_instance.npad_state.buttons.minus() {
         if !pad_instance.old_buttons.minus() {
@@ -105,5 +126,6 @@ pub fn main() {
             err_msg.as_str(),
         );
     }));
-    skyline::install_hooks!(talkui_update);
+    cobapi::install_game_setting(talk_settings_callback);
+    skyline::install_hooks!(talkui_update, myroomreliancesequence_entry, myroomreliancesequence_exit);
 }

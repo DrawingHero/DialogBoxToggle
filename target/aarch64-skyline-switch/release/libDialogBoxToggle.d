@@ -1,0 +1,1 @@
+C:\Users\Matth\DialogBoxToggle\target\aarch64-skyline-switch\release\libDialogBoxToggle.so: C:\Users\Matth\DialogBoxToggle\src\dialog_config.rs C:\Users\Matth\DialogBoxToggle\src\lib.rs C:\Users\Matth\DialogBoxToggle\src\utils.rs
