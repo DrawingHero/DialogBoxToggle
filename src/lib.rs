@@ -30,6 +30,13 @@ pub struct TalkUI {
     pub m_reserve_focus_window: *mut u8,
     pub m_event_picture_controller: *mut u8, 
 }
+
+fn load_config() {
+    unsafe {
+        SWITCH_PRESSED = get_config("talk", false);
+    }
+}
+
 //Function that closes dialog box 
 #[skyline::from_offset(0x21dd070)]
 pub fn talk_ui_hide(this : &TalkUI,  method_info: OptionalMethod);
@@ -126,6 +133,7 @@ pub fn main() {
             err_msg.as_str(),
         );
     }));
+    load_config();
     cobapi::install_game_setting(talk_settings_callback);
     skyline::install_hooks!(talkui_update, myroomreliancesequence_entry, myroomreliancesequence_exit);
 }

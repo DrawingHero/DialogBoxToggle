@@ -1,0 +1,1 @@
+{"rustc":8588628131373237517,"features":"","declared_features":"","target":0,"profile":0,"path":0,"deps":[[9460700559027647097,"build_script_build",false,6328429435253354172],[6893260508610722743,"build_script_build",false,2617006869334392295]],"local":[{"Precalculated":"2.5.0"}],"rustflags":["--cfg","skyline_std_v3"],"metadata":0,"config":0,"compile_kind":0}
